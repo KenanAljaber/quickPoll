@@ -11,20 +11,6 @@ export default class UserService {
     }
 
 
-    async create(userData:IUserRegisterDTO,options: IServiceOptions) {
-        
-        const transaction= await SequelizeRepository.getTransaction(options);
-        try {
-            const user = await UserRepository.create(userData, { ...options, transaction });
-            await SequelizeRepository.commitTransaction(options);
-            return user
-            
-        } catch (error) {
-            await SequelizeRepository.rollbackTransaction(options);
-            throw error
-        }
-        
-    }
 
     async findByEmail(email: string, options: IServiceOptions) {
         try {

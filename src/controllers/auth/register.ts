@@ -2,7 +2,7 @@ import ApiResponse from "../../config/api/apiResponse";
 import { Request, Response } from "express";
 import ErrorWithMessage from "../../errors/errorWithMessage";
 import { IUserRegisterDTO } from "../../database/DTO/IuserDTOs";
-import UserService from "../../service/userService";
+import AuthService from "../../service/authService";
 
 
 export default async (req:any, res:Response) => {
@@ -13,7 +13,7 @@ export default async (req:any, res:Response) => {
         if (!registerDTO.email || !registerDTO.hashedPassword || !registerDTO.firstName || !registerDTO.lastName) {
             throw new ErrorWithMessage('Data  are required',400);
         }
-        const payload = await new UserService(req).create(registerDTO,req);
+        const payload = await new AuthService(req).register(registerDTO);
         return ApiResponse.Success(res,200,{data:payload});
     } catch (error) {
         console.log(error);

@@ -1,8 +1,10 @@
 import { IServiceOptions } from "../config/interfaces/iServiceOptions";
-import { IUserLoginDTO, IUserResponseDTO } from "../database/DTO/IuserDTOs";
+import SequelizeRepository from "../config/sequelizeRepository";
+import { IUserLoginDTO, IUserRegisterDTO, IUserResponseDTO } from "../database/DTO/IuserDTOs";
+import { RoleRepository } from "../database/repository/roleRepository";
 import UserRepository from "../database/repository/userRepository";
 import ErrorWithMessage from "../errors/errorWithMessage";
-import { verifyPassword } from "../security/passwords";
+import { hashPassword, verifyPassword } from "../security/passwords";
 import jsonwebtoken from "jsonwebtoken";
 
 export default class AuthService {
@@ -12,7 +14,20 @@ export default class AuthService {
         this.options=options
     }
 
+     async register(userData: IUserRegisterDTO) {
+        const transaction = await SequelizeRepository.getTransaction(this.options);
+        const alreadyExists = await UserRepository.findByEmail(userData.email, this.options);
+        if (alreadyExists) {
+          throw new ErrorWithMessage("User already exists", 400);
+        }
+        userData.hashedPassword= await hashPassword(userData.hashedPassword);
+        const role = await RoleRepository.findByRole("user", this.options);
+        const user = await this.options.database.user.create({...userData,roleId:role?.id}, { transaction });
+        return user;
+      }
+
     async login(loginData:IUserLoginDTO) {
+        const transaction= await SequelizeRepository.getTransaction(this.options);
         try {
              const user:any = await UserRepository.findByEmail(loginData.email, this.options);
              if (!user) {
@@ -27,6 +42,8 @@ export default class AuthService {
                  throw new ErrorWithMessage('Something went wrong',500);
              }
              const token = jsonwebtoken.sign({ email: user.email, id: user.id }, secret, { expiresIn: '3h' });
+             const lastLogin = new Date();
+             await UserRepository.update(user.id, { lastLogin }, this.options);
              const userResponse:IUserResponseDTO = {
                  id: user.id,
                  firstName: user.firstName,
@@ -35,9 +52,11 @@ export default class AuthService {
                  photoUrl: user.photoUrl,
                  token
              }
+             await SequelizeRepository.commitTransaction(this.options);
              return userResponse
              
         } catch (error) {
+            await SequelizeRepository.rollbackTransaction(this.options);
             throw error
             
         }

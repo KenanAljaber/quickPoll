@@ -21,7 +21,8 @@ export interface IUserResponseDTO{
 
 
 export interface IUserUpdateDTO{
-    firstName: string;
-    lastName: string;
-    photoUrl: string;
+    firstName?: string;
+    lastName?: string;
+    photoUrl?: string;
+    lastLogin?: Date;
 }
