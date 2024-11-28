@@ -51,6 +51,16 @@ export default (sequelize: any, DataTypes: any) => {
     User.belongsTo(models.role, {
       foreignKey: "roleId",
     });
+    User.belongsToMany(models.poll, {
+      through: "pollParticipants",
+      foreignKey: "participantId",
+      otherKey: "pollId",
+      scope: { participantType: "User" },
+    });
+    User.belongsToMany(models.poll, {
+      through: "userPollOwnership",
+      foreignKey: "userId",
+    });
   };
 
   return User;
