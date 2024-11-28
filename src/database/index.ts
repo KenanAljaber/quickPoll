@@ -13,7 +13,7 @@ export default async function initializeModels(connect = true) {
     database: process.env.DATABASE_NAME || "",
     username: process.env.DATABASE_USERNAME || "",
     password: process.env.DATABASE_PASSWORD || "",
-    dialect: "postgres",
+    dialect: process.env.DATABASE_DIALECT as any || "postgres",
     logging: false,
   });
   if (connect) {
@@ -31,7 +31,7 @@ export default async function initializeModels(connect = true) {
   const database: any = {};
   const modelsPath = path.join(__dirname, "models");
 
-  // Dynamically load all model files
+
   fs.readdirSync(modelsPath).forEach((file) => {
     if (file.endsWith(".ts") || file.endsWith(".js")) {
       const model = require(path.join(modelsPath, file)).default;
@@ -42,14 +42,13 @@ export default async function initializeModels(connect = true) {
     }
   });
 
-  // Associate models if needed
+
   Object.keys(database).forEach((modelName) => {
     if (typeof database[modelName].associate === "function") {
       database[modelName].associate(database);
     }
   });
 
-  // Attach sequelize instance to the database object
   database.sequelize = sequelize;
   database.Sequelize = Sequelize;
 

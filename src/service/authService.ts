@@ -14,7 +14,7 @@ export default class AuthService {
         this.options=options
     }
 
-     async register(userData: IUserRegisterDTO) {
+     async register(userData: IUserRegisterDTO): Promise<IUserResponseDTO> {
         const transaction = await SequelizeRepository.getTransaction(this.options);
         const alreadyExists = await UserRepository.findByEmail(userData.email, this.options);
         if (alreadyExists) {
@@ -23,10 +23,17 @@ export default class AuthService {
         userData.hashedPassword= await hashPassword(userData.hashedPassword);
         const role = await RoleRepository.findByRole("user", this.options);
         const user = await this.options.database.user.create({...userData,roleId:role?.id}, { transaction });
-        return user;
+        return {
+            id: user.id,
+            firstName: user.firstName,
+            lastName: user.lastName,
+            email: user.email,
+            photoUrl: user.photoUrl,
+            token: user.token
+        };
       }
 
-    async login(loginData:IUserLoginDTO) {
+    async login(loginData:IUserLoginDTO):Promise<IUserResponseDTO> {
         const transaction= await SequelizeRepository.getTransaction(this.options);
         try {
              const user:any = await UserRepository.findByEmail(loginData.email, this.options);
