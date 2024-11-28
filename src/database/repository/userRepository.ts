@@ -6,17 +6,7 @@ import { IUserRegisterDTO, IUserUpdateDTO } from "../DTO/IuserDTOs";
 import { RoleRepository } from "./roleRepository";
 
 export default class UserRepository {
-  static async create(userData: IUserRegisterDTO, options: IRepositoryOptions) {
-    const transaction = await SequelizeRepository.getTransaction(options);
-    const alreadyExists = await this.findByEmail(userData.email, options);
-    if (alreadyExists) {
-      throw new ErrorWithMessage("User already exists", 400);
-    }
-    userData.hashedPassword= await hashPassword(userData.hashedPassword);
-    const role = await RoleRepository.findByRole("user", options);
-    const user = await options.database.user.create({...userData,roleId:role?.id}, { transaction });
-    return user;
-  }
+
 
   static async findByEmail(email: string, options: IRepositoryOptions) {
     const transaction = await SequelizeRepository.getTransaction(options);
