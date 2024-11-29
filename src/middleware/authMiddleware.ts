@@ -1,7 +1,9 @@
 import jwt from 'jsonwebtoken';
 import ApiResponse from '../config/api/apiResponse';
 import ErrorWithMessage from '../errors/errorWithMessage';
-export default (req:any, res:any, next:any) => {
+import initializeModels from '../database';
+import UserRepository from '../database/repository/userRepository';
+export default async (req:any, res:any, next:any) => {
     const token = req.headers.authorization?.split(' ')[1];
     
     if (!token) {
@@ -11,8 +13,20 @@ export default (req:any, res:any, next:any) => {
 
     try {
         const secret = process.env.JWT_SECRET as string;
-        const user = jwt.verify(token, secret);
-        req.user = user;
+        const user:any = jwt.verify(token, secret);
+        const models= await initializeModels();
+        const userExist = await UserRepository.findById(user.id, {database:models,transaction:null});
+        if( !userExist ){
+            throw new ErrorWithMessage('Unauthorized',401);
+        }
+        req.user = {
+            id: userExist.id,
+            firstName: userExist.firstName,
+            lastName: userExist.lastName,
+            email: userExist.email,
+            photoUrl: userExist.photoUrl,
+            token
+        };
         req.token = token;
         next();
     } catch (err) {

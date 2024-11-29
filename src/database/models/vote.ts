@@ -11,19 +11,13 @@ export default function (sequelize: any, DataTypes: any) {
         type: DataTypes.INET,
         allowNull: false,
       },
-      createdByType: {
-        type: DataTypes.ENUM("Guest", "User"),
-        allowNull: false,
-      },
-      createdById: {
-        type: DataTypes.UUID,
-        allowNull: false,
-      },
 
     },
     {
       timestamps: true,
-      indexes: [{ unique: true, fields: ["pollId", "createdById"] }],
+      indexes: [{ unique: true, fields: ["pollId", "ipAddress"] },
+      { unique: true, fields: ["pollId", "createdByUserId"] },
+      { unique: true, fields: ["pollId", "createdByGuestId"] }],
     }
   );
 
@@ -33,14 +27,12 @@ export default function (sequelize: any, DataTypes: any) {
       as: "poll",
     });
     Vote.belongsTo(models.user, {
-      foreignKey: "createdById",
-      constraints: false,
-      scope: { createdByType: "User" },
+      foreignKey: "createdByUserId",
+      allowNull: true,
     });
     Vote.belongsTo(models.guest, {
-      foreignKey: "createdById",
-      constraints: false,
-      scope: { createdByType: "Guest" },
+      foreignKey: "createdByGuestId",
+      allowNull: true,
     });
     Vote.belongsToMany(models.option, {
       through: "optionVotes",

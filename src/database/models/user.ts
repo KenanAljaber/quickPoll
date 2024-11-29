@@ -48,19 +48,19 @@ export default (sequelize: any, DataTypes: any) => {
     User.hasMany(models.userPlan, {
       foreignKey: "userId",
     });
+    User.hasMany(models.vote, {
+      foreignKey: "createdByUserId",
+    })
     User.belongsTo(models.role, {
       foreignKey: "roleId",
     });
     User.belongsToMany(models.poll, {
       through: "pollParticipants",
-      foreignKey: "participantId",
+      foreignKey: "userParticipantId",
       otherKey: "pollId",
       scope: { participantType: "User" },
     });
-    User.belongsToMany(models.poll, {
-      through: "userPollOwnership",
-      foreignKey: "userId",
-    });
+    User.hasMany(models.poll, { foreignKey: "createdByUserId" });
   };
 
   return User;

@@ -23,7 +23,7 @@ export default function (sequelize: any, DataTypes: any) {
       name: {
         type: DataTypes.STRING,
         allowNull: true,
-      }
+      },
     },
     {
       timestamps: true,
@@ -35,16 +35,12 @@ export default function (sequelize: any, DataTypes: any) {
       foreignKey: "userId",
       allowNull: true,
     });
-
-    Guest.hasMany(models.poll, {
-      foreignKey: "createdById",
-      scope: { createdByType: "Guest" },
-      allowNull: true,
-    });
+    Guest.hasMany(models.vote, { foreignKey: "createdByGuestId" });
+    Guest.hasMany(models.poll, { foreignKey: "createdByGuestId" });
 
     Guest.belongsToMany(models.poll, {
       through: "pollParticipants",
-      foreignKey: "participantId",
+      foreignKey: "guestParticipantId",
       otherKey: "pollId",
       scope: { participantType: "Guest" },
     });

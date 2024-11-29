@@ -1,3 +1,5 @@
+import { on } from "events";
+
 export default function (sequelize: any, DataTypes: any) {
   const Poll = sequelize.define(
     "poll",
@@ -13,20 +15,12 @@ export default function (sequelize: any, DataTypes: any) {
       },
       body: {
         type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: true,
       },
       requiredInfo: {
         type: DataTypes.ENUM("NAME", "EMAIL", "NONE", "BOTH"),
         allowNull: false,
         defaultValue: "NONE",
-      },
-      createdByType: {
-        type: DataTypes.ENUM("Guest", "User"),
-        allowNull: false,
-      },
-      createdById: {
-        type: DataTypes.UUID,
-        allowNull: false,
       },
       state: {
         type: DataTypes.ENUM("OPEN", "CLOSED"),
@@ -42,51 +36,49 @@ export default function (sequelize: any, DataTypes: any) {
       },
       endDate: {
         type: DataTypes.DATE,
-        allowNull: false,
+        allowNull: true,
       },
     },
     {
       timestamps: true,
-      indexes: [{ fields: ["title"] }, ],
+      indexes: [{ fields: ["title"] },{ fields: ["createdByGuestId"] },{ fields: ["requiredInfo"] } ],
     }
   );
 
   Poll.associate = function (models: any) {
-    Poll.belongsToMany(models.user, {
-      through: "userPollOwnership",
-      foreignKey: "pollId",
-      as: "owners",
+    //creation relations
+    Poll.belongsTo(models.user, {
+      foreignKey: "createdByUserId",
+      as: "ownerUser",
     });
+    Poll.belongsTo(models.guest, {
+      foreignKey: "createdByGuestId",
+      as: "ownerGuest",
+    });
+
+    //participation relations
     Poll.belongsToMany(models.user, {
       through: "pollParticipants",
       foreignKey: "pollId",
-      otherKey: "participantId",
-      scope: { participantType: "User" },
+      otherKey: "userParticipantId",
       as: "userParticipants",
     });
     Poll.belongsToMany(models.guest, {
       through: "pollParticipants",
       foreignKey: "pollId",
-      otherKey: "participantId",
-      scope: { participantType: "Guest" },
+      otherKey: "guestParticipantId",
       as: "guestParticipants",
     });
+
+    //votes and options relations
     Poll.hasMany(models.vote, {
       foreignKey: "pollId",
     });
     Poll.hasMany(models.option, {
       foreignKey: "pollId",
+      onDelete: "CASCADE",
     });
-    Poll.belongsTo(models.guest, {
-      foreignKey: "createdById",
-      constraints: false,
-      scope: { createdByType: "Guest" },
-    });
-    Poll.belongsTo(models.user, {
-      foreignKey: "createdById",
-      constraints: false,
-      scope: { createdByType: "User" },
-    });
+
   };
 
   return Poll;

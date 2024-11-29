@@ -25,6 +25,7 @@ export default function (sequelize: any, DataTypes: any) {
   Option.associate = function (models: any) {
     Option.belongsTo(models.poll, {
       foreignKey: "pollId",
+      onDelete: "CASCADE",
     });
     Option.belongsToMany(models.vote, {
       through: "optionVotes",

@@ -14,13 +14,14 @@ const app = express();
 const router=express.Router();
  routes(router);
 models().then(async (res) => {
-    try {
-        // const transaction= await SequelizeRepository.getTransaction(res);
-        // await RoleRepository.create('admin', {database: res, transaction: transaction});
-        // await SequelizeRepository.commitTransaction(res);
-    } catch (error) {
+    // try {
+    //     const transaction= await SequelizeRepository.getTransaction({database: res});
+    //     await RoleRepository.create('admin', {database: res, transaction: transaction});
+    //     await SequelizeRepository.commitTransaction(res);
+    // } catch (error) {
+    //     console.log(error);
         
-    }
+    // }
 });
 app.use(bodyParser.json());
 app.use(databaseMiddleware);

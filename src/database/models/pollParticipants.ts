@@ -7,14 +7,12 @@ export default function (sequelize: any, DataTypes: any) {
         primaryKey: true,
         defaultValue: DataTypes.UUIDV4,
       },
-      participantType: {
-        type: DataTypes.ENUM("Guest", "User"),
-        allowNull: false,
-      },
     },
     {
       timestamps: true,
-      indexes: [{ unique: true, fields: ["pollId", "participantId"] }],
+      indexes: [{ unique: true, fields: ["pollId", "userParticipantId"] },
+      { unique: true, fields: ["pollId", "guestParticipantId"] }
+    ,{ unique: true, fields: ["pollId", "voteId"] }],
     }
   );
 
@@ -23,18 +21,17 @@ export default function (sequelize: any, DataTypes: any) {
       foreignKey: "pollId",
     });
     pollParticipants.belongsTo(models.user, {
-      foreignKey: "participantId",
+      foreignKey: "userParticipantId",
       constraints: false,
-      scope: { participantType: "User" },
     });
     pollParticipants.belongsTo(models.guest, {
-      foreignKey: "participantId",
+      foreignKey: "guestParticipantId",
       constraints: false,
-      scope: { participantType: "Guest" },
     });
     pollParticipants.belongsTo(models.vote, {
       foreignKey: "voteId",
       as: "vote",
+      allowNull: false,
     });
   };
 

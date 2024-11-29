@@ -5,9 +5,7 @@ export default class SequelizeRepository {
     static transaction=null;
     static async  getTransaction(options: any) {
         const database=options.database
-        if(this.transaction) return this.transaction
-        console.log("called",!database.Sequelize);
-        
+        if(this.transaction) return this.transaction    
          this.transaction = await database.sequelize.transaction();
         return this.transaction
     }
