@@ -8,7 +8,8 @@
     "start": "npx ts-node src/server.ts",
     "dev": "npx nodemon src/server.ts",
     "build": "npx tsc",
-    "migration": "npm run build && cpx .env dist/ && node src/migrations/create.js"
+    "migration": "npm run build && cpx .env dist/ && node src/migrations/create.js",
+    "build-and-start": "npm run migration && npm run start"
   },
   "author": "Kenan Aljaber",
   "license": "ISC",
