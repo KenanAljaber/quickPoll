@@ -4,5 +4,6 @@ export interface IParticipationCreateDTO {
     participantType: string,
     optionsId: Array<string>,
     ipAddress: string,
-    requiredInfo?: string
+    email?: string,
+    name?: string
 }
