@@ -6,7 +6,8 @@ export default async (req: any, res: any) => {
   try {
     const id = req.params.id;
     const rawIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
-    const ipAddress = rawIp.startsWith('::ffff:') ? rawIp.split(':').pop() : rawIp;
+    const firstIp = rawIp.split(',')[0].trim();
+    const ipAddress = firstIp.startsWith('::ffff:') ? firstIp.split(':').pop() : firstIp;
     console.log("IP address:", ipAddress);
     
     const pollData: IParticipationCreateDTO = req.body;
