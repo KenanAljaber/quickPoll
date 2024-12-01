@@ -44,6 +44,8 @@ export default function (sequelize: any, DataTypes: any) {
       otherKey: "pollId",
       scope: { participantType: "Guest" },
     });
+
+    Guest.hasMany(models.geolocationData, { foreignKey: "guestId" });
   };
 
   return Guest;

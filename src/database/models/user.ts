@@ -61,6 +61,7 @@ export default (sequelize: any, DataTypes: any) => {
       scope: { participantType: "User" },
     });
     User.hasMany(models.poll, { foreignKey: "createdByUserId" });
+    User.hasMany(models.geolocationData, { foreignKey: "userId" });
   };
 
   return User;

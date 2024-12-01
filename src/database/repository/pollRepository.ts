@@ -40,6 +40,7 @@ export default class PollRepository {
     const transaction = await SequelizeRepository.getTransaction(options);
     let where: any = {};
     let includeArr: any = [];
+    let includeStats=false;
     if (filter) {
       if (filter.title) {
         where.title = {
@@ -60,8 +61,11 @@ export default class PollRepository {
         console.log("includeArr", includeArr);
         
       }
+      if(include.includes("stats")) {
+        includeStats=true
+      }
     }
-    const poll = await options.database.poll.findAndCountAll({
+    const polls = await options.database.poll.findAndCountAll({
       where,
       include:includeArr,
       attributes: this.commonAttributes,
@@ -69,7 +73,37 @@ export default class PollRepository {
       limit,
       transaction,
     });
-    return poll;
+
+    if(includeStats){
+      for(let i=0;i<polls.rows.length;i++) {
+        const currentPoll=polls.rows[i]
+        const stats=await this.getPollStats(currentPoll, options); 
+        polls.rows[i].dataValues.stats=stats
+        
+      }
+
+    }
+    return polls;
+  }
+
+  static async getPollStats(poll: any, options: IRepositoryOptions) {
+    const transaction = await SequelizeRepository.getTransaction(options);
+    const votesCount= await options.database.vote.count({
+      where: { pollId: poll.id },
+      transaction,
+    });
+    const lastVote = await options.database.vote.findOne({
+      where: { pollId: poll.id },
+      order: [["createdAt", "DESC"]],
+      transaction,
+    });
+    const lastVoteDate = lastVote ? lastVote.createdAt : null;
+    const pollSeen = 10;
+    return {
+      votesCount,
+      lastVoteDate,
+      pollSeen
+    };
   }
 
   static async delete(id: string, options: IRepositoryOptions) {

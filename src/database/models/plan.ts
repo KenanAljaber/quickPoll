@@ -26,7 +26,7 @@ export default function (sequelize: any, DataTypes: any) {
         },
         {
             timestamps: true,
-            indexes: [{ unique: true, fields: ["name"] },{fields: ["type"] }],
+            indexes: [{ unique: true, fields: ["name"] }, { fields: ["type"] }],
         }
     );
 

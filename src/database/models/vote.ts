@@ -15,7 +15,7 @@ export default function (sequelize: any, DataTypes: any) {
     },
     {
       timestamps: true,
-      indexes: [{ unique: true, fields: ["pollId", "ipAddress"] },
+      indexes: [{ unique: true, fields: ["pollId", "ipAddress", "createdByUserId", "createdByGuestId"] },
       { unique: true, fields: ["pollId", "createdByUserId"] },
       { unique: true, fields: ["pollId", "createdByGuestId"] }],
     }
