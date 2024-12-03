@@ -11,6 +11,8 @@ export interface IOptionResponseDTO  {
 }
 
 export interface IOptionPollDTO  {
+    id?: string,
     value: string,
-    order: number
+    order: number,
+    percentage?: string
 }

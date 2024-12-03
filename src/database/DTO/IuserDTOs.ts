@@ -2,7 +2,7 @@ export interface IUserRegisterDTO{
     firstName: string;
     lastName: string;
     email: string;
-    hashedPassword: string;
+    password: string;
 }
 
 export interface IUserLoginDTO{
@@ -16,6 +16,7 @@ export interface IUserResponseDTO{
     lastName: string;
     email: string;
     photoUrl: string;
+    role: string;
     token: string;
 }
 

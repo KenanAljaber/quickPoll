@@ -59,6 +59,12 @@ export default function (sequelize: any, DataTypes: any) {
                 allowNull: true
             }
         );
+        GeolocationData.belongsTo(models.pollVisitor,
+            {
+                as: "pollVisitor",
+                allowNull: true
+            }
+        );
     };
 
     return GeolocationData;

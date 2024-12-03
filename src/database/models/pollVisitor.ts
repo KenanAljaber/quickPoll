@@ -2,10 +2,19 @@ export default function (sequelize: any, DataTypes: any) {
     const PollVisitor = sequelize.define(
         "pollVisitor",
         {
-            visitorId: {
+            id: {
                 type: DataTypes.UUID,
                 primaryKey: true,
                 defaultValue: DataTypes.UUIDV4,
+            },
+            visitorId: {
+                type: DataTypes.UUID,
+                allowNull: false,
+                defaultValue: DataTypes.UUIDV4,
+            },
+            pollId: {
+                type: DataTypes.UUID,
+                allowNull: false,
             },
             ipAddress: {
                 type: DataTypes.INET,
@@ -15,17 +24,22 @@ export default function (sequelize: any, DataTypes: any) {
                 type: DataTypes.INTEGER,
                 allowNull: false,
                 defaultValue: 0,
-            }
+            },
         },
         {
             timestamps: true,
-            indexes: [{ fields: ["ipAddress"] }],
+            indexes: [
+                {
+                    fields: ["visitorId", "pollId"],
+                    unique: true, 
+                },
+            ],
         }
     );
 
     PollVisitor.associate = (models: any) => {
         PollVisitor.belongsTo(models.poll, { foreignKey: "pollId" });
-        PollVisitor.hasOne(models.geolocationData, { foreignKey: "visitorId", as: "geolocationData" });
+
     };
 
     return PollVisitor;

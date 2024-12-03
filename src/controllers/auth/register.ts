@@ -10,7 +10,7 @@ export default async (req:any, res:Response) => {
         const registerDTO:IUserRegisterDTO = req.body;
         console.log(registerDTO);
         
-        if (!registerDTO.email || !registerDTO.hashedPassword || !registerDTO.firstName || !registerDTO.lastName) {
+        if (!registerDTO.email || !registerDTO.password || !registerDTO.firstName || !registerDTO.lastName) {
             throw new ErrorWithMessage('Data  are required',400);
         }
         const payload = await new AuthService(req).register(registerDTO);

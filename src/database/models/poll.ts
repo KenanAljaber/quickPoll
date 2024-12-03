@@ -1,4 +1,5 @@
 import { on } from "events";
+import { PollState } from "../DTO/iPollDTOs";
 
 export default function (sequelize: any, DataTypes: any) {
   const Poll = sequelize.define(
@@ -17,17 +18,8 @@ export default function (sequelize: any, DataTypes: any) {
         type: DataTypes.STRING,
         allowNull: true,
       },
-      requiredInfo: {
-        type: DataTypes.ENUM("NAME", "EMAIL", "NONE", "BOTH"),
-        allowNull: false,
-        defaultValue: "NONE",
-      },
       state: {
-        type: DataTypes.ENUM("OPEN", "CLOSED"),
-        allowNull: false,
-      },
-      multiAnswer: {
-        type: DataTypes.BOOLEAN,
+        type: DataTypes.ENUM(PollState.OPEN, PollState.CLOSED),
         allowNull: false,
       },
       imageURL: {
@@ -41,7 +33,7 @@ export default function (sequelize: any, DataTypes: any) {
     },
     {
       timestamps: true,
-      indexes: [{ fields: ["title"] },{ fields: ["createdByGuestId"] },{ fields: ["requiredInfo"] } ],
+      indexes: [{ fields: ["title"] },{ fields: ["createdByGuestId"] },{ fields: ["createdByUserId"] }],
     }
   );
 
@@ -54,6 +46,12 @@ export default function (sequelize: any, DataTypes: any) {
     Poll.belongsTo(models.guest, {
       foreignKey: "createdByGuestId",
       as: "ownerGuest",
+    });
+
+    //view relations
+    Poll.hasOne(models.pollView, {
+      foreignKey: "pollId",
+      as: "views",
     });
 
     //participation relations
@@ -77,6 +75,21 @@ export default function (sequelize: any, DataTypes: any) {
     Poll.hasMany(models.option, {
       foreignKey: "pollId",
       onDelete: "CASCADE",
+      as: "options",
+    });
+
+    //configuration relations
+    Poll.hasOne(models.pollConfiguration, {
+      foreignKey: "pollId",
+      onDelete: "CASCADE",
+      as: "configuration",
+    });
+
+    //security relations
+    Poll.hasOne(models.anonymousPollSecurity, {
+      foreignKey: "pollId",
+      onDelete: "CASCADE",
+      as: "security",
     });
 
   };

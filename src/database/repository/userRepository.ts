@@ -12,6 +12,7 @@ export default class UserRepository {
     const transaction = await SequelizeRepository.getTransaction(options);
     const user = await options.database.user.findOne({
       where: { email },
+      include: [{ model: options.database.role, as: "role" , attributes: ["name"]}],
       transaction,
     });
     return user;
@@ -21,6 +22,7 @@ export default class UserRepository {
     const transaction = await SequelizeRepository.getTransaction(options);
     const user = await options.database.user.findOne({
       where: { id },
+      include: [{ model: options.database.role, as: "role", attributes: ["name"] }],
       transaction,
     });
     return user;

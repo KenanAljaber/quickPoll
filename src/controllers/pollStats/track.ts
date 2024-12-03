@@ -1,12 +1,15 @@
 import ApiResponse from "../../config/api/apiResponse";
-import { IPollTrackingDTO } from "../../database/DTO/iPollStatsDTOs";
+import { IPollTrackingCreateDTO } from "../../database/DTO/iPollStatsDTOs";
+import ErrorWithMessage from "../../errors/errorWithMessage";
 import PollStatsService from "../../service/pollStatsService";
 import GeolocationHelper from "../../utils/geolocationHelper";
 
 export default async (req: any, res: any) => {
     try {
+        
+        const data: IPollTrackingCreateDTO = req.body;
+        if (!data.pollId || !data.visitorId)  throw new ErrorWithMessage("tracking info is missing", 400);
         const ipAddress = GeolocationHelper.extractIpAddress(req);
-        const data: IPollTrackingDTO = req.body;
         data.ipAddress = ipAddress;
         console.log(data);
         

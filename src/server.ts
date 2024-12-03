@@ -17,6 +17,7 @@ models().then(async (res) => {
     // try {
     //     const transaction= await SequelizeRepository.getTransaction({database: res});
     //     await RoleRepository.create('admin', {database: res, transaction: transaction});
+    //     await RoleRepository.create('user', {database: res, transaction: transaction});
     //     await SequelizeRepository.commitTransaction(res);
     // } catch (error) {
     //     console.log(error);

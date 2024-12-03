@@ -25,7 +25,8 @@ export default async (req:any, res:any, next:any) => {
             lastName: userExist.lastName,
             email: userExist.email,
             photoUrl: userExist.photoUrl,
-            token
+            token,
+            role: userExist.role.name
         };
         req.token = token;
         next();

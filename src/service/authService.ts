@@ -27,13 +27,13 @@ export default class AuthService {
       if (alreadyExists) {
         throw new ErrorWithMessage("User already exists", 400);
       }
-      userData.hashedPassword = await hashPassword(userData.hashedPassword);
+      userData.password = await hashPassword(userData.password);
       const role = await RoleRepository.findByRole("user", this.options);
       userData.email = userData.email.toLowerCase();
       userData.firstName = this.capitalizeFirstLetter(userData.firstName);
       userData.lastName = this.capitalizeFirstLetter(userData.lastName);
       const user = await this.options.database.user.create(
-        { ...userData, roleId: role?.id },
+        { ...userData, roleId: role?.id,hashedPassword: userData.password },
         { transaction }
       );
       await SequelizeRepository.commitTransaction(this.options);
@@ -44,6 +44,7 @@ export default class AuthService {
         email: user.email,
         photoUrl: user.photoUrl,
         token: user.token,
+        role: role.name,
       };
     } catch (error) {
       await SequelizeRepository.rollbackTransaction(this.options);
@@ -86,6 +87,7 @@ export default class AuthService {
         email: user.email,
         photoUrl: user.photoUrl,
         token,
+        role: user.role.name,
       };
       await SequelizeRepository.commitTransaction(this.options);
       return userResponse;

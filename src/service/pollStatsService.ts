@@ -1,6 +1,6 @@
 import { IServiceOptions } from "../config/interfaces/iServiceOptions";
 import SequelizeRepository from "../config/sequelizeRepository";
-import { IPollTrackingDTO } from "../database/DTO/iPollStatsDTOs";
+import { IPollTrackingCreateDTO } from "../database/DTO/iPollStatsDTOs";
 import PollStatsRepository from "../database/repository/pollStatsRepository";
 
 export default class PollStatsService {
@@ -12,7 +12,7 @@ export default class PollStatsService {
     }
 
 
-    async trackVisitor(data: IPollTrackingDTO) {
+    async trackVisitor(data: IPollTrackingCreateDTO) {
         const transaction= await SequelizeRepository.getTransaction(this.options);
         try {
             const pollVisitor = await PollStatsRepository.trackVisitor(data, { ...this.options, transaction }); 

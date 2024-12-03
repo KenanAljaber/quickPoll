@@ -1,6 +1,8 @@
 import { Sequelize,Transaction } from "sequelize";
 import { IServiceOptions } from "./interfaces/iServiceOptions";
+import { IRepositoryOptions } from "./interfaces/iRepositoryOptions";
 export default class SequelizeRepository {
+
     constructor() {}
     static transaction=null;
     static async  getTransaction(options: any) {
@@ -22,6 +24,11 @@ export default class SequelizeRepository {
         await transaction.rollback();
         this.transaction=null
     }
-
+    static getCurrentUser(options: IRepositoryOptions) {
+        if (options.user) {
+          return options.user;
+        }
+        return null;
+      }
 
 }

@@ -1,9 +1,10 @@
 import { IServiceOptions } from "../config/interfaces/iServiceOptions";
 import SequelizeRepository from "../config/sequelizeRepository";
-import { IParticipationCreateDTO } from "../database/DTO/IParticipationDTOs";
-import { IPollCreateDTO } from "../database/DTO/iPollDTOs";
+import { IVoteCreateDTO } from "../database/DTO/iVoteDTOs";
+import { IAnonymousPollCredentialsDTO, IPollCreateDTO } from "../database/DTO/iPollDTOs";
 import ParticipationRepository from "../database/repository/participationRepository";
 import PollRepository from "../database/repository/pollRepository";
+import voteRepository from "../database/repository/voterepository";
 
 export default class PollService {
   options: IServiceOptions;
@@ -22,7 +23,17 @@ export default class PollService {
       await SequelizeRepository.commitTransaction(this.options);
       return poll;
     } catch (error) {
+      console.log(error);
       await SequelizeRepository.rollbackTransaction(this.options);
+      throw error;
+    }
+  }
+
+  async authenticateAnonymousPoll(credentials: IAnonymousPollCredentialsDTO) {
+    try {
+      const poll = await PollRepository.authenticateAnonymousPoll(credentials, this.options);
+      return poll;
+    } catch (error) {
       throw error;
     }
   }
@@ -46,6 +57,7 @@ export default class PollService {
       await SequelizeRepository.commitTransaction(this.options);
       return poll;
     } catch (error) {
+      console.log(error);
       await SequelizeRepository.rollbackTransaction(this.options);
       throw error;
     }
@@ -71,10 +83,10 @@ export default class PollService {
     }
   }
 
-  async participate(data:IParticipationCreateDTO) {
+  async participate(data: IVoteCreateDTO) {
     const transaction = await SequelizeRepository.getTransaction(this.options);
     try {
-      const poll = await ParticipationRepository.create(data, {
+      const poll = await voteRepository.create(data, {
         ...this.options,
         transaction,
       });

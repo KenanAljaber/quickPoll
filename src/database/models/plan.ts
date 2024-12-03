@@ -1,3 +1,5 @@
+
+
 export default function (sequelize: any, DataTypes: any) {
     const Plan = sequelize.define(
         "plan",
@@ -11,7 +13,11 @@ export default function (sequelize: any, DataTypes: any) {
                 type: DataTypes.STRING,
                 allowNull: false,
             },
-            price: {
+            pricePerMonth: {
+                type: DataTypes.DECIMAL,
+                allowNull: false,
+            },
+            pricePerYear: {
                 type: DataTypes.DECIMAL,
                 allowNull: false,
             },
@@ -19,14 +25,10 @@ export default function (sequelize: any, DataTypes: any) {
                 type: DataTypes.STRING,
                 allowNull: false,
             },
-            type: {
-                type: DataTypes.ENUM('MONTHLY', 'YEARLY'),
-                allowNull: false,
-            },
         },
         {
             timestamps: true,
-            indexes: [{ unique: true, fields: ["name"] }, { fields: ["type"] }],
+            indexes: [{ unique: true, fields: ["name"] }],
         }
     );
 
