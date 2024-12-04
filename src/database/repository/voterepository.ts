@@ -22,6 +22,7 @@ export default class voteRepository {
         ipAddress: data.ipAddress,
       };
       await this.participationControl(data, options);
+      await this.checkPollRequiredInfo(data, options);
       await this.checkPollOptionsIntegrity(data, options);
       // if(data.participantType=="Guest"){
       //     await this.checkGuestParticipationIntegrity(data, options);
@@ -55,6 +56,36 @@ export default class voteRepository {
       );
       return vote;
     }
+  static async checkPollRequiredInfo(data: IVoteCreateDTO, options: IRepositoryOptions) {
+    const transaction = SequelizeRepository.getTransaction(options);
+    const poll = options.database.poll.findOne({
+      where: { id: data.pollId },
+      include:[{
+        model: options.database.pollConfiguration,
+        as: "configuration",
+      }],
+      transaction,
+    });
+    if (!poll) throw new ErrorWithMessage("Invalid poll", 400);
+    const requiredInfo = poll.requiredInfo;
+    switch (requiredInfo) {
+      case POLL_REQUIRED_INFO.NONE:
+        break;
+      case POLL_REQUIRED_INFO.EMAIL:
+        if (!data.email) throw new ErrorWithMessage("Email is required", 400);
+        break;
+      case POLL_REQUIRED_INFO.NAME:
+        if (!data.name) throw new ErrorWithMessage("Name is required", 400);
+        break;
+      case POLL_REQUIRED_INFO.BOTH:
+        if (!data.email) throw new ErrorWithMessage("Email is required", 400);
+        if (!data.name) throw new ErrorWithMessage("Name is required", 400);
+        break;
+      default:
+        break;
+    }
+
+  }
   
     static async findOrCreateVoteIpAddressGeolocation(ipAddress: string, voteId: string, options: IRepositoryOptions) {
       const transaction = await SequelizeRepository.getTransaction(options);
