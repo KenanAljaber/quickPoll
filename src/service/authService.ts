@@ -28,7 +28,7 @@ export default class AuthService {
         throw new ErrorWithMessage("User already exists", 400);
       }
       userData.password = await hashPassword(userData.password);
-      const role = await RoleRepository.findByRole("user", this.options);
+      const role = await RoleRepository.getDefaultRole(this.options);
       userData.email = userData.email.toLowerCase();
       userData.firstName = this.capitalizeFirstLetter(userData.firstName);
       userData.lastName = this.capitalizeFirstLetter(userData.lastName);
@@ -37,7 +37,7 @@ export default class AuthService {
         { transaction }
       );
       await SequelizeRepository.commitTransaction(this.options);
-      return {
+      const createdUser= {
         id: user.id,
         firstName: user.firstName,
         lastName: user.lastName,
@@ -46,6 +46,7 @@ export default class AuthService {
         token: user.token,
         role: role.name,
       };
+      return createdUser;
     } catch (error) {
       await SequelizeRepository.rollbackTransaction(this.options);
       throw error;

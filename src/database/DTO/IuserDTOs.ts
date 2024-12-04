@@ -27,3 +27,5 @@ export interface IUserUpdateDTO{
     photoUrl?: string;
     lastLogin?: Date;
 }
+
+export const DEFAULT_ROLE = "user";
